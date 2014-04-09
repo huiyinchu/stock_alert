@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+
+  "name": "Stock Real Time Alert",
+  "description": "Stock real-time tracker and alert",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "stockalert_extension_24x24.png",
+    "default_popup": "./src/stock_alert.html"
+  },
+  "permissions": [
+    "https://secure.flickr.com/"
+  ]
+}
