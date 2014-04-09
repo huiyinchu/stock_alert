@@ -2,19 +2,42 @@
  * Created by kehuang on 4/4/14.
  */
 
+var GOOGLE_QUERY_MODE = 'GoogleQueryMode';
+var YAHOO_QUERY_MODE = 'YahooQueryMode';
+var WEBSERVICE_QUERY_MODE = 'WebserviceQueryMode';
+
 function Controller(view, myQuoteAlert, quoteList) {
     this.view = view;
     this.myQuoteAlert = myQuoteAlert;
     this.quoteList = quoteList;
+    this.mode = GOOGLE_QUERY_MODE;
 }
 
 Controller.prototype.initView = function() {
     this.view.init(this.quoteList, this);// create the initial empty view by given symbols
 }
 
+Controller.prototype.setMode = function(mode) {
+    if (mode == GOOGLE_QUERY_MODE) {
+        this.mode = GOOGLE_QUERY_MODE;
+    } else if (mode == YAHOO_QUERY_MODE) {
+        this.mode = YAHOO_QUERY_MODE;
+    } else if (mode == WEBSERVICE_QUERY_MODE) {
+        this.mode = WEBSERVICE_QUERY_MODE;
+    } else {
+        console.error('Error: unknown mode.');
+    }
+}
+
 Controller.prototype.enter = function(symbol) {
+    if (this.quoteList.indexOf(symbol) == -1) { // a new symbol
+        this.quoteList[this.quoteList.length] = symbol;
+    }
     this.updateQuote(symbol);
-//    this.view.hideAddSymbolText(); // don't hide the text box
+}
+
+Controller.prototype.updateAllQuotes = function() {
+    this.updateQuote(this.quoteList);
 }
 
 /**
@@ -26,16 +49,20 @@ Controller.prototype.enter = function(symbol) {
  * The call back method is 'updateHtml'.
  */
 Controller.prototype.updateQuote = function (symbol) {
-    var oThis = this;
-    if (this.quoteList.indexOf(symbol) == -1) { // a new symbol
-        this.quoteList[this.quoteList.length] = symbol;
+    // the symbol can be a single string symbol, or a list of symbols (updateAllQuotes will pass the whole list)
+    if (this.mode == GOOGLE_QUERY_MODE) {
+        this.googleUpdateQuote(symbol);
+    } else if (this.mode == YAHOO_QUERY_MODE) {
+        this.yqlUpdateQuote(symbol);
+    } else if (this.mode == WEBSERVICE_QUERY_MODE) {
+        this.webserviceUpdateQuote(symbol);
+    } else {
+        console.error('Error: unknown mode.');
     }
-    this.yqlUpdateQuote(symbol);
+
+//    this.yqlUpdateQuote(symbol);
 }
 
-Controller.prototype.updateAllQuotes = function() {
-    this.yqlUpdateQuote(this.quoteList);
-}
 
 Controller.prototype.removeQuote =  function (symbol) {
     // update the list
@@ -86,7 +113,6 @@ Controller.prototype.yqlUpdateQuote = function(symbols) {
     query += '&env=http%3A%2F%2Fdatatables.org%2Falltables.env&format=json';
     var oThis = this;
     var finalQuery = url + '?' + query;
-//    console.log(finalQuery);
     $.getJSON(url, query)
         .done(function (data){
             if (data.query.results != null) {
@@ -94,11 +120,11 @@ Controller.prototype.yqlUpdateQuote = function(symbols) {
                 if (Object.prototype.toString.call(quotes) === '[object Array]') {
                     for (var i = 0; i < quotes.length; i++) {
                         // encapsulate the information
-                        var quoteModel = new QuoteModel(quotes[i]);
+                        var quoteModel = new QuoteModel(quotes[i], YAHOO_QUERY_MODE);
                         oThis.view.updateView(quoteModel);
                     }
                 } else {
-                    var quoteModel = new QuoteModel(quotes);
+                    var quoteModel = new QuoteModel(quotes, YAHOO_QUERY_MODE);
                     oThis.view.updateView(quoteModel);
                 }
             }
@@ -107,7 +133,7 @@ Controller.prototype.yqlUpdateQuote = function(symbols) {
         })
         .fail(function(jqxhr, textStatus, error){
             var err = textStatus + ", " + error;
-            console.log('Request failed: ' + err);
+            console.error('Request failed: ' + err);
         });
 }
 
@@ -118,22 +144,95 @@ Controller.prototype.checkAlert = function(quoteModel) {
 
 
 /**
- * @deprecated Google will ask for captcha.
+ * Google may require captcha.
  * @param symbol
  */
-Controller.prototype.googleUpdateQuote = function(symbol) {
+Controller.prototype.googleUpdateQuote = function(symbols) {
     var oThis = this;
+
+    var baseUrl = "http://finance.google.com/finance/info";
+    var query = '';
+
+    if (Object.prototype.toString.call(symbols) === '[object Array]') { // if it is an array
+        for (var i = 0; i < symbols.length; i++) {
+            query += symbols[i] + ',';
+        }
+        query = query.substr(0, query.length - 1);
+    } else {
+        query = symbols;
+    }
+
+    var parameters = {client: 'ig', q: query};
     $.get(
-        "http://finance.google.com/finance/info",
-        {client: "ig", q: symbol},
+        baseUrl,
+        parameters,
         function (data) {
             try {
-                document.write(data.t);
-                document.write(data.p);
-                document.write(data.c);
-                document.write(data.cp);
-//                var quoteModel = new QuoteModel(data.substr(5, data.length - 7)); // get the model change
-//                oThis.view.updateView(quoteModel);
+                var jsonString = data.substr(data.indexOf('['), data.lastIndexOf(']'));
+                var jsonObjects = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));// parse the string to json object
+                for (var i = 0; i < jsonObjects.length; i++) {
+                    var jsonObject = jsonObjects[i];
+                    var quoteModel = new QuoteModel(jsonObject, GOOGLE_QUERY_MODE); // get the model change
+                    oThis.view.updateView(quoteModel);
+                }
+            } catch (err) {
+                document.write("Error: " + err);
+            }
+        }
+    );
+}
+
+Controller.prototype.webserviceUpdateQuote = function(symbols) {
+    var query = '';
+    if (Object.prototype.toString.call(symbols) === '[object Array]') { // if it is an array
+        for (var i = 0; i < symbols.length; i++) {
+            this.webserviceUpdateSingleQuote(symbols[i]);
+        }
+    } else {
+        this.webserviceUpdateSingleQuote(symbols);
+    }
+}
+
+Controller.prototype.webserviceUpdateSingleQuote = function(symbol) {
+    var oThis = this;
+    $.get(
+        "http://www.webservicex.net/stockquote.asmx/GetQuote",
+        {symbol: symbol},
+        function (data) {
+            try {
+                var xmlString = data.lastElementChild.innerHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                // use jQuery to parse
+                var xml = $.parseXML(xmlString);
+
+                var xmlDoc;
+                if (window.DOMParser){
+                    var parser=new DOMParser();
+                    xmlDoc=parser.parseFromString(xmlString,"text/xml");
+                } else {
+                    xmlDoc=new ActiveXObject("Microsoft.XMLDOM");
+                    xmlDoc.async=false;
+                    xmlDoc.loadXML(xmlString);
+                }
+
+                // StockQuotes, Stock,Symbol
+                var allStocks = xmlDoc.getElementsByTagName('StockQuotes')[0].childNodes;
+                for (var i = 0; i < allStocks.length; i++) {
+                    var symbol = xmlDoc.getElementsByTagName('Symbol')[i].childNodes[0].nodeValue;
+                    var price = xmlDoc.getElementsByTagName('Last')[i].childNodes[0].nodeValue.toString();
+                    var changePrice = xmlDoc.getElementsByTagName('Change')[i].childNodes[0].nodeValue;
+                    var changePercent = xmlDoc.getElementsByTagName('PercentageChange')[i].childNodes[0].nodeValue.toString();// contains %
+                    var daysLow = xmlDoc.getElementsByTagName('Low')[i].childNodes[0].nodeValue.toString();
+                    var daysHigh = xmlDoc.getElementsByTagName('High')[i].childNodes[0].nodeValue;
+                    var json = new Object();
+                    json['symbol'] = symbol;
+                    json['price'] = price;
+                    json['changePrice'] = changePrice;
+                    json['changePercent'] = changePercent;
+                    json['daysLow'] = daysLow;
+                    json['daysHigh'] = daysHigh;
+                    var quoteModel = new QuoteModel(json, WEBSERVICE_QUERY_MODE); // get the model change
+                    oThis.view.updateView(quoteModel);
+                }
             } catch (err) {
                 document.write("Error: " + err);
             }

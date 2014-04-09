@@ -51,10 +51,10 @@ View.prototype.init = function(quoteList, controller) {
 
     this.createTableTitlebar();
 
-    // add the quotes
+    // add the empty quotes
     if (quoteList.length > 0) {
         for (var i = 0; i < quoteList.length; i++) {
-            var quoteModel = new QuoteModel(quoteList[i]);
+            var quoteModel = new QuoteModel(quoteList[i], null);
             this.updateView(quoteModel); // initialize the table
         }
     }
@@ -169,7 +169,6 @@ View.prototype.getWellFormedHtml = function (quoteModel) {
     html += this.getPriceHtml(quoteModel.symbol, quoteModel.price, quoteModel.changePercent);
     html += this.getChangePriceHtml(quoteModel.symbol, quoteModel.changePrice);
     html += this.getChangePercentHtml(quoteModel.symbol, quoteModel.changePercent);
-    console.log(this.getChangePercentHtml(quoteModel.symbol, quoteModel.changePercent));
     html += this.getDaysLowOrHighHtml(quoteModel.symbol, quoteModel.DaysLow, this.daysLowLabel);
     html += this.getDaysLowOrHighHtml(quoteModel.symbol, quoteModel.DaysHigh, this.daysHighLabel);
     html += this.getDeleteButtonHtml(quoteModel.symbol);
@@ -275,6 +274,8 @@ View.prototype.hideAddSymbolText = function() {
 View.prototype.roundNumber = function(num) {
     if (isNaN(num) || num == "") {
         return num;
+    } else if (num == null) {
+        return 'N/A';
     }
     var x = parseFloat(num).toFixed(2);
     return x;
