@@ -12,7 +12,6 @@ var controller = new Controller(view, myQuoteAlert, initialQuoteList);
 
 function showAddQuoteText() {
     $('#addSymbolText').css('visibility', 'visible');
-    controller.updateQuote('GOOG');
 }
 
 $(document).ready(function () {
