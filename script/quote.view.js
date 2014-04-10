@@ -115,7 +115,7 @@ View.prototype.updateView = function(quoteModel) {
  */
 View.prototype.addDeleteButton = function(quoteModel) {
     // add the delete action
-    var deleteButton = document.getElementById(this.getKey(quoteModel.symbol, this.deleteButtonIdPrefix));
+    var deleteButton = document.getElementById(getKey(quoteModel.symbol, this.deleteButtonIdPrefix));
     var oThis = this;
     var symbol = quoteModel.symbol;
     if (deleteButton) {
@@ -144,11 +144,11 @@ View.prototype.addDeleteButton = function(quoteModel) {
  */
 View.prototype.liteUpdateViewForSymbol = function(quoteModel) {
     var symbol = quoteModel.symbol;
-    $('#' + this.getKey(symbol, this.priceIdPrefix)).replaceWith(this.getPriceHtml(quoteModel.symbol, quoteModel.price, quoteModel.changePercent));
-    $('#' + this.getKey(symbol, this.changePriceIdPrefix)).replaceWith(this.getChangePriceHtml(quoteModel.symbol, quoteModel.changePrice));
-    $('#' + this.getKey(symbol, this.changePercentIdPrefix)).replaceWith(this.getChangePercentHtml(quoteModel.symbol, quoteModel.changePercent));
-    $('#' + this.getKey(symbol, this.daysLowIdPrefix)).replaceWith(this.getDaysLowOrHighHtml(quoteModel.symbol, quoteModel.DaysLow, this.daysLowLabel));
-    $('#' + this.getKey(symbol, this.daysHighIdPrefix)).replaceWith(this.getDaysLowOrHighHtml(quoteModel.symbol, quoteModel.DaysHigh, this.daysHighLabel));
+    $('#' + getKey(symbol, this.priceIdPrefix)).replaceWith(this.getPriceHtml(quoteModel.symbol, quoteModel.price, quoteModel.changePercent));
+    $('#' + getKey(symbol, this.changePriceIdPrefix)).replaceWith(this.getChangePriceHtml(quoteModel.symbol, quoteModel.changePrice));
+    $('#' + getKey(symbol, this.changePercentIdPrefix)).replaceWith(this.getChangePercentHtml(quoteModel.symbol, quoteModel.changePercent));
+    $('#' + getKey(symbol, this.daysLowIdPrefix)).replaceWith(this.getDaysLowOrHighHtml(quoteModel.symbol, quoteModel.DaysLow, this.daysLowLabel));
+    $('#' + getKey(symbol, this.daysHighIdPrefix)).replaceWith(this.getDaysLowOrHighHtml(quoteModel.symbol, quoteModel.DaysHigh, this.daysHighLabel));
 }
 
 /**
@@ -184,8 +184,8 @@ View.prototype.getDeleteButtonHtml = function(symbol) {
         return '<span style="display: inline-block; width: ' + this.deleteButtonWidth + 'px"></span>';
     }
 
-    return '<i id="' + this.getKey(symbol, this.deleteButtonIdPrefix) + '" class="' + fa_trash_o_grey+'"></i>';
-//    return '<img id="' + this.getKey(symbol, this.deleteButtonIdPrefix) + '" src="./../resources/trash.png" style="vertical-align: middle ;display: inline-block; width: ' + this.deleteButtonWidth + 'px;"/>';
+    return '<i id="' + getKey(symbol, this.deleteButtonIdPrefix) + '" class="' + fa_trash_o_grey+'"></i>';
+//    return '<img id="' + getKey(symbol, this.deleteButtonIdPrefix) + '" src="./../resources/trash.png" style="vertical-align: middle ;display: inline-block; width: ' + this.deleteButtonWidth + 'px;"/>';
 }
 
 //View.prototype.getAddButtonHtml = function() {
@@ -206,11 +206,11 @@ View.prototype.getPriceHtml = function(symbol, price, change) {
         return '<span style="color: black;display: inline-block; width: ' + this.priceWidth + 'px;">' + price + '</span>';
     } else {
         if (change > 0) {
-            return '<span id="' + this.getKey(symbol, this.priceIdPrefix) + '" style="color: green;display: inline-block; width: ' + this.priceWidth + 'px;">' + this.roundNumber(price) + '</span>';
+            return '<span id="' + getKey(symbol, this.priceIdPrefix) + '" style="color: green;display: inline-block; width: ' + this.priceWidth + 'px;">' + roundNumber(price) + '</span>';
         } else if (change < 0) {
-            return '<span id="' + this.getKey(symbol, this.priceIdPrefix) + '" style="color: red;display: inline-block; width: ' + this.priceWidth + 'px;">' + this.roundNumber(price) + '</span>';
+            return '<span id="' + getKey(symbol, this.priceIdPrefix) + '" style="color: red;display: inline-block; width: ' + this.priceWidth + 'px;">' + roundNumber(price) + '</span>';
         } else {
-            return '<span id="' + this.getKey(symbol, this.priceIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.priceWidth + 'px;">' + this.roundNumber(price) + '</span>';
+            return '<span id="' + getKey(symbol, this.priceIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.priceWidth + 'px;">' + roundNumber(price) + '</span>';
         }
     }
 
@@ -222,11 +222,11 @@ View.prototype.getChangePriceHtml = function(symbol, number) {
         return '<span style="color: black;display: inline-block; width: ' + this.changePriceWidth + 'px;">' + number + '</span>';
     } else {
         if (number > 0) {
-            return '<span id="' + this.getKey(symbol, this.changePriceIdPrefix) + '" style="color: green;display: inline-block; width: ' + this.changePriceWidth + 'px;">' + this.roundNumber(number) + '</span>';
+            return '<span id="' + getKey(symbol, this.changePriceIdPrefix) + '" style="color: green;display: inline-block; width: ' + this.changePriceWidth + 'px;">' + roundNumber(number) + '</span>';
         } else if (number < 0) {
-            return '<span id="' + this.getKey(symbol, this.changePriceIdPrefix) + '" style="color: red;display: inline-block; width: ' + this.changePriceWidth + 'px;">' + this.roundNumber(number) + '</span>';
+            return '<span id="' + getKey(symbol, this.changePriceIdPrefix) + '" style="color: red;display: inline-block; width: ' + this.changePriceWidth + 'px;">' + roundNumber(number) + '</span>';
         } else {
-            return '<span id="' + this.getKey(symbol, this.changePriceIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.changePriceWidth + 'px;">' + this.roundNumber(number) + '</span>';
+            return '<span id="' + getKey(symbol, this.changePriceIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.changePriceWidth + 'px;">' + roundNumber(number) + '</span>';
         }
     }
 }
@@ -241,15 +241,15 @@ View.prototype.getChangePercentHtml = function(symbol, num) {
                 return '<span style="color: black;display: inline-block; width: ' + this.changePercentWidth + 'px;">' + num + '</span>';
             } else {
                 if (number > 0) {
-                    return '<span id="' + this.getKey(symbol, this.changePercentIdPrefix) + '" style="color: green;display: inline-block; width: ' + this.changePercentWidth + 'px;">(' + this.roundNumber(number) + '%)</span>';
+                    return '<span id="' + getKey(symbol, this.changePercentIdPrefix) + '" style="color: green;display: inline-block; width: ' + this.changePercentWidth + 'px;">(' + roundNumber(number) + '%)</span>';
                 } else if (number < 0) {
-                    return '<span id="' + this.getKey(symbol, this.changePercentIdPrefix) + '" style="color: red;display: inline-block; width: ' + this.changePercentWidth + 'px;">(' + this.roundNumber(number) + '%)</span>';
+                    return '<span id="' + getKey(symbol, this.changePercentIdPrefix) + '" style="color: red;display: inline-block; width: ' + this.changePercentWidth + 'px;">(' + roundNumber(number) + '%)</span>';
                 } else {
-                    return '<span id="' + this.getKey(symbol, this.changePercentIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.changePercentWidth + 'px;">(' + this.roundNumber(number) + '%)</span>';
+                    return '<span id="' + getKey(symbol, this.changePercentIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.changePercentWidth + 'px;">(' + roundNumber(number) + '%)</span>';
                 }
             }
         } else {
-            return '<span id="' + this.getKey(symbol, this.changePercentIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.changePercentWidth + 'px;"></span>'; // space hold
+            return '<span id="' + getKey(symbol, this.changePercentIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.changePercentWidth + 'px;"></span>'; // space hold
         }
     }
 }
@@ -259,9 +259,9 @@ View.prototype.getDaysLowOrHighHtml = function(symbol, num, type) {
         this.viewWidth += this.daysLowOrHighWidth;
         return '<span style="color: black;display: inline-block; width: ' + this.daysLowOrHighWidth + 'px;">' + num + '</span>';
     } else if (type == this.daysLowLabel) {
-        return '<span id="' + this.getKey(symbol, this.daysLowIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.daysLowOrHighWidth + 'px;">' + this.roundNumber(num) + '</span>';
+        return '<span id="' + getKey(symbol, this.daysLowIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.daysLowOrHighWidth + 'px;">' + roundNumber(num) + '</span>';
     } else if (type == this.daysHighLabel) {
-        return '<span id="' + this.getKey(symbol, this.daysHighIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.daysLowOrHighWidth + 'px;">' + this.roundNumber(num) + '</span>';
+        return '<span id="' + getKey(symbol, this.daysHighIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.daysLowOrHighWidth + 'px;">' + roundNumber(num) + '</span>';
     } else {
         console.error("Error: unknown parameters.");
     }
@@ -269,26 +269,4 @@ View.prototype.getDaysLowOrHighHtml = function(symbol, num, type) {
 
 View.prototype.hideAddSymbolText = function() {
     $('#addSymbolText').css('visibility', 'hidden');
-}
-
-View.prototype.roundNumber = function(num) {
-    if (isNaN(num) || num == "") {
-        return num;
-    } else if (num == null) {
-        return 'N/A';
-    }
-    var x = parseFloat(num).toFixed(2);
-    return x;
-}
-
-String.prototype.endsWith = function(suffix) {
-    return this.indexOf(suffix, this.length - suffix.length) !== -1;
-};
-
-String.prototype.startsWith = function(prefix) {
-    return this.indexOf(prefix) === 0;
-};
-
-View.prototype.getKey = function(symbol, prefix) {
-    return prefix + '_' + symbol;
 }

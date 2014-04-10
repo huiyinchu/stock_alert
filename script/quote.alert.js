@@ -25,14 +25,14 @@ MyQuoteAlert.prototype.readModelFromLocalStorage = function(quoteList) {
     if (window.localStorage) {
         if (Object.prototype.toString.call(quoteList) === '[object Array]') {
             for (var i = 0; i < quoteList.length; i++) {
-                if (localStorage[this.getKey(quoteList[i], this.stopLossPrefix)]) { // read stop loss
-                    this.stopLosses[quoteList[i]] = localStorage[this.getKey(quoteList[i], this.stopLossPrefix)];
+                if (localStorage[getKey(quoteList[i], this.stopLossPrefix)]) { // read stop loss
+                    this.stopLosses[quoteList[i]] = localStorage[getKey(quoteList[i], this.stopLossPrefix)];
                 }
                 //
             }
         } else {
-            if (localStorage[this.getKey(quoteList, this.stopLossPrefix)]) { // read stop loss
-                this.stopLosses[quoteList] = localStorage[this.getKey(quoteList, this.stopLossPrefix)];
+            if (localStorage[getKey(quoteList, this.stopLossPrefix)]) { // read stop loss
+                this.stopLosses[quoteList] = localStorage[getKey(quoteList, this.stopLossPrefix)];
             }
         }
     }
@@ -96,13 +96,7 @@ MyQuoteAlert.prototype.setStopLoss = function(symbol) {
     } else {
         this.stopLosses[symbol] = stopLossVal;
         if (window.localStorage) {
-            localStorage.setItem(this.getKey(symbol, this.stopLossPrefix), stopLossVal);// persist the data in browser
+            localStorage.setItem(getKey(symbol, this.stopLossPrefix), stopLossVal);// persist the data in browser
         }
     }
 }
-
-
-MyQuoteAlert.prototype.getKey = function(symbol, type) {
-    return type + '_' + symbol;
-}
-
