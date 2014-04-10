@@ -150,37 +150,67 @@ Controller.prototype.checkAlert = function(quoteModel) {
 Controller.prototype.googleUpdateQuote = function(symbols) {
     var oThis = this;
 
-    var baseUrl = "http://finance.google.com/finance/info";
-    var query = '';
+    var baseUrl = "http://www.google.com/finance/info";
+    var symbolString = '';
 
     if (Object.prototype.toString.call(symbols) === '[object Array]') { // if it is an array
         for (var i = 0; i < symbols.length; i++) {
-            query += symbols[i] + ',';
+            symbolString += symbols[i] + ',';
         }
-        query = query.substr(0, query.length - 1);
+        symbolString = symbolString.substr(0, symbolString.length - 1);
     } else {
-        query = symbols;
+        symbolString = symbols;
     }
 
-    var parameters = {client: 'ig', q: query};
-    $.get(
-        baseUrl,
-        parameters,
-        function (data) {
-            try {
-                var jsonString = data.substr(data.indexOf('['), data.lastIndexOf(']'));
-                var jsonObjects = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));// parse the string to json object
-                for (var i = 0; i < jsonObjects.length; i++) {
-                    var jsonObject = jsonObjects[i];
-                    var quoteModel = new QuoteModel(jsonObject, GOOGLE_QUERY_MODE); // get the model change
-                    oThis.view.updateView(quoteModel);
-                }
-            } catch (err) {
-                document.write("Error: " + err);
-            }
-        }
-    );
+    var url = 'https://www.google.com/finance/info?infotype=infoquoteall&q=' + symbolString + '&callback=?';
+    $.getJSON(url, function(data) {
+        $.each(data, function(k, v){
+           // each value is a JSON object, so just pass it
+            var quoteModel = new QuoteModel(v, GOOGLE_QUERY_MODE); // get the model change
+            oThis.view.updateView(quoteModel);
+        });
+    });
 }
+
+
+///**
+// * @deprecated Use googleUpdateQuote to get the quote since that has days low/high data.
+// * @param symbols
+// */
+//Controller.prototype.googleUpdateQuote2 = function(symbols) {
+//    var oThis = this;
+//
+//    var baseUrl = "http://finance.google.com/finance/info";
+//    var query = '';
+//
+//    if (Object.prototype.toString.call(symbols) === '[object Array]') { // if it is an array
+//        for (var i = 0; i < symbols.length; i++) {
+//            query += symbols[i] + ',';
+//        }
+//        query = query.substr(0, query.length - 1);
+//    } else {
+//        query = symbols;
+//    }
+//
+//    var parameters = {client: 'ig', q: query};
+//    $.get(
+//        baseUrl,
+//        parameters,
+//        function (data) {
+//            try {
+//                var jsonString = data.substr(data.indexOf('['), data.lastIndexOf(']'));
+//                var jsonObjects = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));// parse the string to json object
+//                for (var i = 0; i < jsonObjects.length; i++) {
+//                    var jsonObject = jsonObjects[i];
+//                    var quoteModel = new QuoteModel(jsonObject, GOOGLE_QUERY_MODE); // get the model change
+//                    oThis.view.updateView(quoteModel);
+//                }
+//            } catch (err) {
+//                document.write("Error: " + err);
+//            }
+//        }
+//    );
+//}
 
 Controller.prototype.webserviceUpdateQuote = function(symbols) {
     var query = '';

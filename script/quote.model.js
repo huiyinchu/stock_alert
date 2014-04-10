@@ -2,9 +2,6 @@
  * Created by kehuang on 4/3/14.
  */
 
-var daysLows = new Object();
-var daysHighs = new Object();
-
 /**
  * The model here is responsible for parsing the given object (json object or just a string) to the
  * structured information we want.
@@ -19,27 +16,8 @@ function QuoteModel(json, mode) {
             this.price = json['l'];
             this.changePrice = json['c'];
             this.changePercent = json['cp'] + '%';
-
-            // Google doesn't provide days low or high, we need to maintain it on our own
-            if (this.symbol in daysLows) {
-                if (daysLows[this.symbol] > this.price) {
-                    daysLows[this.symbol] = this.price;
-                }
-            } else {
-                daysLows[this.symbol] = this.price;
-            }
-            this.DaysLow = daysLows[this.symbol];
-
-
-            if (this.symbol in daysHighs) {
-                if (daysHighs[this.symbol] < this.price) {
-                    daysHighs[this.symbol] = this.price;
-                }
-            } else {
-                daysHighs[this.symbol] = this.price;
-            }
-            this.DaysHigh = daysHighs[this.symbol];
-
+            this.DaysLow = json['lo'];
+            this.DaysHigh = json['hi'];
         } else {
             console.error("Error: cannot parse JSON result from Google");
         }
