@@ -79,6 +79,7 @@ View.prototype.init = function(quoteList, controller) {
         });
     }
 
+    this.addTitlebarClickableEvent();
     this.updateDimension();
 }
 
@@ -87,31 +88,34 @@ View.prototype.createTableTitlebar = function() {
     var html = '<div id="'+tableTitlebarId+'" style="display: inline-block; margin-bottom: ' + this.tableTitlebarMarginBottom + 'px">';
 
     // symbol column
-    html += generateCellHTML(null, this.symbolIdPrefix, this.symbolLabel, 'title_symbol', CELL_TYPE_TITLE_BAR_HEADER);
+    html += generateCellHTML(null, this.symbolIdPrefix, this.symbolLabel, 'title_symbol', CELL_TYPE_TITLE_BAR_HEADER, null);
     this.viewWidth += getClassWidth('title_symbol');
 
     // price column
-    html += generateCellHTML(null, this.priceIdPrefix, this.priceLabel, 'title_price', CELL_TYPE_TITLE_BAR_HEADER);
+    html += generateCellHTML(null, this.priceIdPrefix, this.priceLabel, 'title_price', CELL_TYPE_TITLE_BAR_HEADER, null);
     this.viewWidth += getClassWidth('title_price')
 
     // change $
-    html += generateCellHTML(null, this.changePriceIdPrefix, this.changePriceLabel, 'title_change_price', CELL_TYPE_TITLE_BAR_HEADER);
+    html += generateCellHTML(null, this.changePriceIdPrefix, this.changePriceLabel, 'title_change_price', CELL_TYPE_TITLE_BAR_HEADER, null);
     this.viewWidth += getClassWidth('title_change_price');
 
     // change %
-    html += generateCellHTML(null, this.changePercentIdPrefix, this.changePercentLabel, 'title_change_percent', CELL_TYPE_TITLE_BAR_HEADER);
+    html += generateCellHTML(null, this.changePercentIdPrefix, this.changePercentLabel, 'title_change_percent', CELL_TYPE_TITLE_BAR_HEADER, null);
     this.viewWidth += getClassWidth('title_change_percent');
 
     // open
-    html += generateCellHTML(null, this.openIdPrefix, this.openLabel, 'title_open', CELL_TYPE_TITLE_BAR_HEADER);
+    html += generateCellHTML(null, this.openIdPrefix, this.openLabel, 'title_open', CELL_TYPE_TITLE_BAR_HEADER, null);
     this.viewWidth += getClassWidth('title_open');
 
     // days low
-    html += generateCellHTML(null, this.daysLowIdPrefix, this.daysLowLabel, 'title_days_low_high', CELL_TYPE_TITLE_BAR_HEADER);
+    var daysLowOptions = new Object();
+    daysLowOptions['clickable'] = 'javascript:void(0)';
+    daysLowOptions['text-decoration'] = 'none';
+    html += generateCellHTML(null, this.daysLowIdPrefix, this.daysLowLabel, 'title_days_low_high', CELL_TYPE_TITLE_BAR_HEADER, daysLowOptions);
     this.viewWidth += getClassWidth('title_days_low_high');
 
     // days high
-    html += generateCellHTML(null, this.daysHighIdPrefix, this.daysHighLabel, 'title_days_low_high', CELL_TYPE_TITLE_BAR_HEADER);
+    html += generateCellHTML(null, this.daysHighIdPrefix, this.daysHighLabel, 'title_days_low_high', CELL_TYPE_TITLE_BAR_HEADER, daysLowOptions);
     this.viewWidth += getClassWidth('title_days_low_high');
 
     // delete button
@@ -262,30 +266,30 @@ View.prototype.createRowHTMLForQuote = function (quoteModel) {
 }
 
 View.prototype.getSymbolHtml = function(symbol) {
-    return generateCellHTML(symbol, this.symbolIdPrefix, symbol, 'symbol', CELL_TYPE_DATA);
+    return generateCellHTML(symbol, this.symbolIdPrefix, symbol, 'symbol', CELL_TYPE_DATA, null);
 }
 
 View.prototype.getPriceHtml = function(symbol, price, change) {
-    return generateCellHTML(symbol, this.priceIdPrefix, price, 'price', CELL_TYPE_DATA);
+    return generateCellHTML(symbol, this.priceIdPrefix, price, 'price', CELL_TYPE_DATA, null);
 }
 
 View.prototype.getChangePriceHtml = function(symbol, number) {
-    return generateCellHTML(symbol, this.changePriceIdPrefix, number, 'change_price_even', CELL_TYPE_DATA);
+    return generateCellHTML(symbol, this.changePriceIdPrefix, number, 'change_price_even', CELL_TYPE_DATA, null);
 }
 
 View.prototype.getChangePercentHtml = function(symbol, num) {
-    return generateCellHTML(symbol, this.changePercentIdPrefix, num, 'change_percent_even', CELL_TYPE_DATA);
+    return generateCellHTML(symbol, this.changePercentIdPrefix, num, 'change_percent_even', CELL_TYPE_DATA, null);
 }
 
 View.prototype.getOpenHtml = function(symbol, num) {
-    return generateCellHTML(symbol, this.openIdPrefix, num, 'open', CELL_TYPE_DATA);
+    return generateCellHTML(symbol, this.openIdPrefix, num, 'open', CELL_TYPE_DATA, null);
 }
 
 View.prototype.getDaysLowOrHighHtml = function(symbol, num, type) {
     if (type == this.daysLowLabel) {
-        return generateCellHTML(symbol, this.daysLowIdPrefix, num, 'days_low', CELL_TYPE_DATA);
+        return generateCellHTML(symbol, this.daysLowIdPrefix, num, 'days_low', CELL_TYPE_DATA, null);
     } else if (type == this.daysHighLabel) {
-        return generateCellHTML(symbol, this.daysHighIdPrefix, num, 'days_high', CELL_TYPE_DATA);
+        return generateCellHTML(symbol, this.daysHighIdPrefix, num, 'days_high', CELL_TYPE_DATA, null);
     } else {
         console.error("Error: unknown parameters.");
     }
@@ -337,5 +341,32 @@ View.prototype.addDeleteButtonEvent = function(quoteModel) {
 
 View.prototype.addTitlebarClickableEvent = function() {
     // clickable the days low/high to switch between price/percentage
+    var daysLowElementId = getIdForTitle(this.daysLowIdPrefix);
+    var daysLowElement = document.getElementById(daysLowElementId);
+    var oThis = this;
+    if (daysLowElement) {
+        daysLowElement.addEventListener('click', function(){
+            oThis.switchDaysLowHighMode(daysLowElementId);
+            oThis.controller.updateAllQuotes();// for after/pre-market update
+        });
+    }
 
+    var daysHighELementId = getIdForTitle(this.daysHighIdPrefix);
+    var daysHighElement = document.getElementById(daysHighELementId);
+    var oThis = this;
+    if (daysHighElement) {
+        daysHighElement.addEventListener('click', function(){
+            oThis.switchDaysLowHighMode(daysHighELementId);
+            oThis.controller.updateAllQuotes();// for after/pre-market update
+        });
+    }
+
+}
+
+View.prototype.switchDaysLowHighMode = function(type) {
+    if (type == getIdForTitle(this.daysLowIdPrefix)) {
+        this.daysLowMode = this.daysLowMode == DAYS_LOW_HIGH_PRICE_MODE? DAYS_LOW_HIGH_PERCENT_MODE: DAYS_LOW_HIGH_PRICE_MODE;
+    } else {
+        this.daysHighMode = this.daysHighMode == DAYS_LOW_HIGH_PRICE_MODE? DAYS_LOW_HIGH_PERCENT_MODE: DAYS_LOW_HIGH_PRICE_MODE;
+    }
 }

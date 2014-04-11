@@ -80,9 +80,21 @@ function getElementNumericAttribute(id, attributeName) {
     return parseInt(val.substr(0, val.length - 2));
 }
 
-function generateCellHTML(symbol, prefix, value, className, type) {
+function generateCellHTML(symbol, prefix, value, className, type, options) {
     if (type == CELL_TYPE_TITLE_BAR_HEADER) {
-        return '<span id="' + getIdForTitle(prefix) + '" class="' + className + '">' + value + '</span>'
+        if (options != null) {
+            if ('clickable' in options) {
+                var href = options['clickable'];
+                if ('text-decoration' in options) {
+                    return '<a style="text-decoration: ' + options['text-decoration'] + '" href="' + href + '" id="' + getIdForTitle(prefix) + '" class="' + className + '">' + value + '</a>';
+                } else {
+                    return '<a href="' + href + '" id="' + getIdForTitle(prefix) + '" class="' + className + '">' + value + '</a>';
+                }
+            }
+            return '<span id="' + getIdForTitle(prefix) + '" class="' + className + '">' + value + '</span>';
+        } else {
+            return '<span id="' + getIdForTitle(prefix) + '" class="' + className + '">' + value + '</span>';
+        }
     } else if (type == CELL_TYPE_DATA) {
         if (isNaN(value)) {
             if (value.endsWith('%')) {
