@@ -39,9 +39,13 @@ Controller.prototype.enter = function(symbol) {
 }
 
 Controller.prototype.updateAllQuotes = function() {
+    console.log(document.getElementById('marketStatus').innerHTML);
     if (isMarketOpen() || this.firstQuote) {
         this.updateQuote(this.quoteList);
         this.firstQuote = false;
+        document.getElementById('marketStatus').innerHTML = '';
+    } else {
+        document.getElementById('marketStatus').innerHTML = 'Market Closed';
     }
 }
 

@@ -38,10 +38,10 @@ function View() {
     this.daysLowIdPrefix = 'daysLowId';
     this.daysHighIdPrefix = 'daysHighId';
 
-    this.daysLowMode = DAYS_LOW_HIGH_PRICE_MODE;
-    this.daysHighMode = DAYS_LOW_HIGH_PRICE_MODE;
-//    this.daysLowMode = DAYS_LOW_HIGH_PERCENT_MODE
-//    this.daysHighMode = DAYS_LOW_HIGH_PERCENT_MODE;
+//    this.daysLowMode = DAYS_LOW_HIGH_PRICE_MODE;
+//    this.daysHighMode = DAYS_LOW_HIGH_PRICE_MODE;
+    this.daysLowMode = DAYS_LOW_HIGH_PERCENT_MODE
+    this.daysHighMode = DAYS_LOW_HIGH_PERCENT_MODE;
 
     this.deleteButtonLabel = " ";
     this.deleteButtonIdPrefix = 'deleteButtonId';
@@ -102,6 +102,10 @@ View.prototype.createTableTitlebar = function() {
     html += generateCellHTML(null, this.changePercentIdPrefix, this.changePercentLabel, 'title_change_percent', CELL_TYPE_TITLE_BAR_HEADER);
     this.viewWidth += getClassWidth('title_change_percent');
 
+    // open
+    html += generateCellHTML(null, this.openIdPrefix, this.openLabel, 'title_open', CELL_TYPE_TITLE_BAR_HEADER);
+    this.viewWidth += getClassWidth('title_open');
+
     // days low
     html += generateCellHTML(null, this.daysLowIdPrefix, this.daysLowLabel, 'title_days_low_high', CELL_TYPE_TITLE_BAR_HEADER);
     this.viewWidth += getClassWidth('title_days_low_high');
@@ -141,7 +145,7 @@ View.prototype.updateView = function(quoteModel) {
     var selector = "#" + quoteModel.symbol;
     if ($(selector).length == 0) {
         // add the child
-        var quoteHtml = this.getWellFormedHtml(quoteModel); // update the view
+        var quoteHtml = this.createRowHTMLForQuote(quoteModel); // update the view
         $("#livequotes").append(quoteHtml);
         this.addDeleteButtonEvent(quoteModel);
     } else {
@@ -187,6 +191,10 @@ View.prototype.liteUpdateViewForSymbol = function(quoteModel) {
         element.className = 'change_percent_even';
     }
 
+    // update open
+    element = $('#' + getKey(symbol, this.openIdPrefix))[0];
+    element.innerHTML = quoteModel.open;
+
     // update days low
     var element2 = $('#' + getKey(symbol, this.daysLowIdPrefix));
     element = element2[0];
@@ -226,13 +234,14 @@ View.prototype.removeView = function(symbol) {
     }
 }
 
-View.prototype.getWellFormedHtml = function (quoteModel) {
+View.prototype.createRowHTMLForQuote = function (quoteModel) {
     var html = '<div id="' + quoteModel.symbol + '" style="padding-top:0px;padding-bottom:0px">';
     html += '<p>';
     html += this.getSymbolHtml(quoteModel.symbol);
     html += this.getPriceHtml(quoteModel.symbol, quoteModel.price, quoteModel.changePercent);
     html += this.getChangePriceHtml(quoteModel.symbol, quoteModel.changePrice);
     html += this.getChangePercentHtml(quoteModel.symbol, quoteModel.changePercent);
+    html += this.getOpenHtml(quoteModel.symbol, quoteModel.open);
     html += this.getDaysLowOrHighHtml(quoteModel.symbol, quoteModel.DaysLow, this.daysLowLabel);
     html += this.getDaysLowOrHighHtml(quoteModel.symbol, quoteModel.DaysHigh, this.daysHighLabel);
     html += this.getDeleteButtonHtml(quoteModel.symbol);
@@ -256,6 +265,10 @@ View.prototype.getChangePriceHtml = function(symbol, number) {
 
 View.prototype.getChangePercentHtml = function(symbol, num) {
     return generateCellHTML(symbol, this.changePercentIdPrefix, num, 'change_percent_even', CELL_TYPE_DATA);
+}
+
+View.prototype.getOpenHtml = function(symbol, num) {
+    return generateCellHTML(symbol, this.openIdPrefix, num, 'open', CELL_TYPE_DATA);
 }
 
 View.prototype.getDaysLowOrHighHtml = function(symbol, num, type) {
