@@ -38,10 +38,10 @@ function View() {
     this.daysLowIdPrefix = 'daysLowId';
     this.daysHighIdPrefix = 'daysHighId';
 
-//    this.daysLowMode = DAYS_LOW_HIGH_PRICE_MODE;
-//    this.daysHighMode = DAYS_LOW_HIGH_PRICE_MODE;
-    this.daysLowMode = DAYS_LOW_HIGH_PERCENT_MODE
-    this.daysHighMode = DAYS_LOW_HIGH_PERCENT_MODE;
+    this.daysLowMode = DAYS_LOW_HIGH_PRICE_MODE;
+    this.daysHighMode = DAYS_LOW_HIGH_PRICE_MODE;
+//    this.daysLowMode = DAYS_LOW_HIGH_PERCENT_MODE
+//    this.daysHighMode = DAYS_LOW_HIGH_PERCENT_MODE;
 
     this.deleteButtonLabel = " ";
     this.deleteButtonIdPrefix = 'deleteButtonId';
@@ -183,43 +183,53 @@ View.prototype.liteUpdateViewForSymbol = function(quoteModel) {
     // update the change (%)
     element = $('#' + getKey(symbol, this.changePercentIdPrefix))[0];
     element.innerHTML = '(' + quoteModel.changePercent + ')';
-    if (quoteModel.changePercent.startsWith('+')) {
-        element.className = 'change_percent_up';
-    } else if (quoteModel.changePercent.startsWith('-')) {
+    if (parseFloat(quoteModel.changePercent.substr(0, quoteModel.changePercent.length - 1)) < 0) {
         element.className = 'change_percent_down';
+    } else if (parseFloat(quoteModel.changePercent.substr(0, quoteModel.changePercent.length - 1)) > 0) {
+        element.className = 'change_percent_up';
     } else {
         element.className = 'change_percent_even';
     }
 
     // update open
     element = $('#' + getKey(symbol, this.openIdPrefix))[0];
-    element.innerHTML = quoteModel.open;
+    element.innerHTML = quoteModel.open == ''? 'N/A' : quoteModel.open;
 
     // update days low
     var element2 = $('#' + getKey(symbol, this.daysLowIdPrefix));
     element = element2[0];
     var delta = ((quoteModel.DaysLow - quoteModel.open)/ quoteModel.open) * 100;
-    if (this.daysLowMode == DAYS_LOW_HIGH_PRICE_MODE) {
-        element.innerHTML = quoteModel.DaysLow;
+    if (isNaN(delta)) {
+        element.innerHTML = 'N/A';
     } else {
-        element.innerHTML = roundNumber(delta) + '%';
+        if (this.daysLowMode == DAYS_LOW_HIGH_PRICE_MODE) {
+            element.innerHTML = quoteModel.DaysLow;
+        } else {
+            element.innerHTML = roundNumber(delta) + '%';
+        }
+        if (delta < 0) {
+            element2.css('color', 'red');
+        }
     }
-    if (delta < 0) {
-        element2.css('color', 'red');
-    }
+
 //    $('#' + getKey(symbol, this.daysLowIdPrefix))[0].innerHTML = quoteModel.DaysLow;
 
     element2 = $('#' + getKey(symbol, this.daysHighIdPrefix));
     element = element2[0];
     delta = ((quoteModel.DaysHigh - quoteModel.open)/ quoteModel.open) * 100;
-    if (this.daysHighMode == DAYS_LOW_HIGH_PRICE_MODE) {
-        element.innerHTML = quoteModel.DaysHigh;
+    if (isNaN(delta)) {
+        element.innerHTML = 'N/A';
     } else {
-        element.innerHTML = roundNumber(delta) + '%';
+        if (this.daysHighMode == DAYS_LOW_HIGH_PRICE_MODE) {
+            element.innerHTML = quoteModel.DaysHigh;
+        } else {
+            element.innerHTML = roundNumber(delta) + '%';
+        }
+        if (delta > 0) {
+            element2.css('color', 'green');
+        }
     }
-    if (delta > 0) {
-        element2.css('color', 'green');
-    }
+
 //    $('#' + getKey(symbol, this.daysHighIdPrefix))[0].innerHTML = quoteModel.DaysHigh;
 }
 
