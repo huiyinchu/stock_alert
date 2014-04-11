@@ -8,12 +8,13 @@ var fa_gear_lg_grey = "fa fa-gear fa-lg fa-color_grey";
 var fa_gear_lg_grey_spin = "fa fa-gear fa-lg fa-color_grey fa-spin";
 var DAYS_LOW_HIGH_PRICE_MODE = 'DAYS_LOW_HIGH_PRICE_MODE';
 var DAYS_LOW_HIGH_PERCENT_MODE = 'DAYS_LOW_HIGH_PERCENT_MODE';
+var tableTitlebarId = "table_title_bar";// need to change stock_alert.css
 
 function View() {
 
     this.viewWidth = 0;
 
-    this.tableTitlebarId = "table_title_bar";// need to change stock_alert.css
+
     this.tableTitlebarMarginBottom = -10;
 
     this.symbolLabel = "Symbol";
@@ -83,14 +84,35 @@ View.prototype.init = function(quoteList, controller) {
 
 View.prototype.createTableTitlebar = function() {
     // add the title
-    var html = '<div id="'+this.tableTitlebarId+'" style="display: inline-block; margin-bottom: ' + this.tableTitlebarMarginBottom + 'px">';
-    html += this.getSymbolHtml(this.symbolLabel);
-    html += this.getPriceHtml(null, this.priceLabel, 0);
-    html += this.getChangePriceHtml(null, this.changePriceLabel);
-    html += this.getChangePercentHtml(null, this.changePercentLabel);
-    html += this.getDaysLowOrHighHtml(null, this.daysLowLabel, null);
-    html += this.getDaysLowOrHighHtml(null, this.daysHighLabel, null);
+    var html = '<div id="'+tableTitlebarId+'" style="display: inline-block; margin-bottom: ' + this.tableTitlebarMarginBottom + 'px">';
+
+    // symbol column
+    html += generateCellHTML(null, this.symbolIdPrefix, this.symbolLabel, 'title_symbol', CELL_TYPE_TITLE_BAR_HEADER);
+    this.viewWidth += getClassWidth('title_symbol');
+
+    // price column
+    html += generateCellHTML(null, this.priceIdPrefix, this.priceLabel, 'title_price', CELL_TYPE_TITLE_BAR_HEADER);
+    this.viewWidth += getClassWidth('title_price')
+
+    // change $
+    html += generateCellHTML(null, this.changePriceIdPrefix, this.changePriceLabel, 'title_change_price', CELL_TYPE_TITLE_BAR_HEADER);
+    this.viewWidth += getClassWidth('title_change_price');
+
+    // change %
+    html += generateCellHTML(null, this.changePercentIdPrefix, this.changePercentLabel, 'title_change_percent', CELL_TYPE_TITLE_BAR_HEADER);
+    this.viewWidth += getClassWidth('title_change_percent');
+
+    // days low
+    html += generateCellHTML(null, this.daysLowIdPrefix, this.daysLowLabel, 'title_days_low_high', CELL_TYPE_TITLE_BAR_HEADER);
+    this.viewWidth += getClassWidth('title_days_low_high');
+
+    // days high
+    html += generateCellHTML(null, this.daysHighIdPrefix, this.daysHighLabel, 'title_days_low_high', CELL_TYPE_TITLE_BAR_HEADER);
+    this.viewWidth += getClassWidth('title_days_low_high');
+
+    // delete button
     html += this.getDeleteButtonHtml(this.deleteButtonLabel);
+
     html += '</div>'
     $("#livequotes").append(html);
 }
@@ -221,81 +243,26 @@ View.prototype.getWellFormedHtml = function (quoteModel) {
 }
 
 View.prototype.getSymbolHtml = function(symbol) {
-    if (symbol == this.symbolLabel) {
-        this.viewWidth += getClassWidth('title_symbol');
-        return '<span id="' + this.getIdForTitle(this.symbolIdPrefix) + '" class="title_symbol">' + symbol + '</span>';
-    } else {
-        return '<span class="symbol">' + '<a target="_blank" href="https://www.google.com/finance?q=' + symbol + '"> ' + symbol + '</a></span>';
-    }
+    return generateCellHTML(symbol, this.symbolIdPrefix, symbol, 'symbol', CELL_TYPE_DATA);
 }
+
 View.prototype.getPriceHtml = function(symbol, price, change) {
-    if (price == this.priceLabel) {
-        this.viewWidth += getClassWidth('title_price')
-        return '<span class="title_price">' + price + '</span>';
-    } else {
-        if (change > 0) {
-            return '<span class="price" id="' + getKey(symbol, this.priceIdPrefix) + '" >' + roundNumber(price) + '</span>';
-        } else if (change < 0) {
-            return '<span class="price" id="' + getKey(symbol, this.priceIdPrefix) + '" >' + roundNumber(price) + '</span>';
-        } else {
-            return '<span class="price" id="' + getKey(symbol, this.priceIdPrefix) + '" >' + roundNumber(price) + '</span>';
-        }
-    }
-
-
+    return generateCellHTML(symbol, this.priceIdPrefix, price, 'price', CELL_TYPE_DATA);
 }
+
 View.prototype.getChangePriceHtml = function(symbol, number) {
-    if (number == this.changePriceLabel) {
-        this.viewWidth += getClassWidth('title_change_price');
-        return '<span id="' + this.getIdForTitle(this.changePriceLabel) + '" class="title_change_price">' + number + '</span>';
-    } else {
-        if (number > 0) {
-            return '<span class="change_price_up" id="' + getKey(symbol, this.changePriceIdPrefix) + '">' + roundNumber(number) + '</span>';
-        } else if (number < 0) {
-            return '<span class="change_price_down" id="' + getKey(symbol, this.changePriceIdPrefix) + '">' + roundNumber(number) + '</span>';
-        } else {
-            return '<span class="change_price_even" id="' + getKey(symbol, this.changePriceIdPrefix) + '">' + roundNumber(number) + '</span>';
-        }
-    }
-}
-View.prototype.getChangePercentHtml = function(symbol, num) {
-    if (num == this.changePercentLabel) {
-        this.viewWidth += getClassWidth('title_change_percent');
-        return '<span id="' + this.getIdForTitle(this.changePercentLabel) + '" class="title_change_percent">' + num + '</span>';
-    } else {
-        if (num.match('%$')) {
-            var number = num.substr(0, num.length - 1); // remove %
-            if (isNaN(number) || number == "") {
-                return '<span class="title_change_percent" ">' + num + '</span>';
-            } else {
-                if (number > 0) {
-                    return '<span class="change_percent_up" id="' + getKey(symbol, this.changePercentIdPrefix) + '">(' + roundNumber(number) + '%)</span>';
-                } else if (number < 0) {
-                    return '<span class="change_percent_down" id="' + getKey(symbol, this.changePercentIdPrefix) + '">(' + roundNumber(number) + '%)</span>';
-                } else {
-                    return '<span class="change_percent_even" id="' + getKey(symbol, this.changePercentIdPrefix) + '">(' + roundNumber(number) + '%)</span>';
-                }
-            }
-        } else {
-//            return '<span id="' + getKey(symbol, this.changePercentIdPrefix) + '" style="color: black;display: inline-block; width: ' + this.changePercentWidth + 'px;"></span>'; // space hold
-            return '<span id="' + getKey(symbol, this.changePercentIdPrefix) + '"></span>'; // place holder
-        }
-    }
+    return generateCellHTML(symbol, this.changePriceIdPrefix, number, 'change_price_even', CELL_TYPE_DATA);
 }
 
+View.prototype.getChangePercentHtml = function(symbol, num) {
+    return generateCellHTML(symbol, this.changePercentIdPrefix, num, 'change_percent_even', CELL_TYPE_DATA);
+}
 
 View.prototype.getDaysLowOrHighHtml = function(symbol, num, type) {
-    if (num == this.daysLowLabel) {
-        this.viewWidth += getClassWidth('title_days_low_high');
-        return '<span id="' + this.getIdForTitle(this.daysLowLabel) + '" class="title_days_low_high">' + num + '</span>';
-    } else if (num == this.daysHighLabel) {
-        this.viewWidth += getClassWidth('title_days_low_high');
-        return '<span id="' + this.getIdForTitle(this.daysHighLabel) + '" class="title_days_low_high">' + num + '</span>';
-    }
-    else if (type == this.daysLowLabel) {
-        return '<span class="days_low" id="' + getKey(symbol, this.daysLowIdPrefix) + '">' + roundNumber(num) + '</span>';
+    if (type == this.daysLowLabel) {
+        return generateCellHTML(symbol, this.daysLowIdPrefix, num, 'days_low', CELL_TYPE_DATA);
     } else if (type == this.daysHighLabel) {
-        return '<span class="days_high" id="' + getKey(symbol, this.daysHighIdPrefix) + '">' + roundNumber(num) + '</span>';
+        return generateCellHTML(symbol, this.daysHighIdPrefix, num, 'days_high', CELL_TYPE_DATA);
     } else {
         console.error("Error: unknown parameters.");
     }
@@ -312,10 +279,6 @@ View.prototype.getDeleteButtonHtml = function(symbol) {
 
 View.prototype.hideAddSymbolText = function() {
     $('#addSymbolText').css('visibility', 'hidden');
-}
-
-View.prototype.getIdForTitle = function(columnPrefix) {
-    return getKey(this.tableTitlebarId, columnPrefix);
 }
 
 

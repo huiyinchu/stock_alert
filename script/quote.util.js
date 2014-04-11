@@ -4,6 +4,9 @@
 var OPEN_MARKET_AM_TIME = '09:20:00';
 var CLOSE_MARKET_PM_TIME = '04:00:00';
 
+var CELL_TYPE_TITLE_BAR_HEADER = 'CELL_TYPE_TITLE_BAR_HEADER';
+var CELL_TYPE_DATA = 'CELL_TYPE_TITLE_DATA';
+
 function isMarketOpen () {
     var localeTime = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
     localeTime = localeTime.split(/\s+/);
@@ -75,6 +78,30 @@ function getClassWidth(className) {
 function getElementNumericAttribute(id, attributeName) {
     var val = $('#' + id).css(attributeName);
     return parseInt(val.substr(0, val.length - 2));
+}
+
+function generateCellHTML(symbol, prefix, value, className, type) {
+    if (type == CELL_TYPE_TITLE_BAR_HEADER) {
+        return '<span id="' + getIdForTitle(prefix) + '" class="' + className + '">' + value + '</span>'
+    } else if (type == CELL_TYPE_DATA) {
+        if (isNaN(value)) {
+            if (value.endsWith('%')) {
+                value = parseInt(value.substr(0, value.length - 1));
+                return '<span id="' + getKey(symbol, prefix) + '" class="'+className+'">(' + roundNumber(value) + '%)</span>';
+            } else {
+                return '<span id="' + getKey(symbol, prefix) + '" class="'+className+'">' + value + '</span>';
+            }
+        } else {
+            return '<span id="' + getKey(symbol, prefix) + '" class="'+className+'">' + roundNumber(value) + '</span>';
+        }
+
+    } else {
+        console.log("Error: unknown type.");
+    }
+}
+
+function getIdForTitle(columnPrefix) {
+    return getKey(tableTitlebarId, columnPrefix);
 }
 
 //String.prototype.isEarlierThan = function(time2) {
