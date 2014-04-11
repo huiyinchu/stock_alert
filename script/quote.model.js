@@ -18,6 +18,7 @@ function QuoteModel(json, mode) {
             this.changePercent = json['cp'] + '%';
             this.DaysLow = json['lo'];
             this.DaysHigh = json['hi'];
+            this.open = json['op'];
         } else {
             console.error("Error: cannot parse JSON result from Google");
         }
@@ -29,6 +30,7 @@ function QuoteModel(json, mode) {
             this.changePercent = json['PercentChange'];
             this.DaysLow = json['DaysLow'];
             this.DaysHigh = json['DaysHigh'];
+            this.open = json['Open'];
         } else {
             console.error("Error: cannot parse JSON result from Yahoo");
         }
@@ -40,6 +42,7 @@ function QuoteModel(json, mode) {
             this.changePercent = json['changePercent'];
             this.DaysLow = json['daysLow'];
             this.DaysHigh = json['daysHigh'];
+            this.open = json['Open'];
         } else {
             console.error("Error: cannot parse JSON result from Webservicex");
         }
@@ -50,6 +53,7 @@ function QuoteModel(json, mode) {
         this.changePercent = '';
         this.DaysLow = '';
         this.DaysHigh = '';
+        this.open = '';
     }
 
 }

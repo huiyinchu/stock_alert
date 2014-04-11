@@ -20,3 +20,76 @@ body {
 .fa-color_grey {
     color:#808080;
 }
+
+
+
+.symbol,
+.title_symbol {
+    color: #000000;
+    display: inline-block;
+    width: 50px;
+}
+
+.price,
+.title_price {
+    color: #000000;
+    display: inline-block;
+    width: 40px;
+}
+
+
+.title_change_price, .change_price_even {
+    color: #000000;
+    display: inline-block;
+    width: 32px;
+}
+
+.change_price_down {
+    color: red;
+    display: inline-block;
+    width: 32px;
+}
+
+.change_price_up {
+    color: green;
+    display: inline-block;
+    width: 32px;
+}
+
+.title_change_percent, .change_percent_even {
+    color: #000000;
+    display: inline-block;
+    width: 50px;
+}
+
+.change_percent_down {
+    color: red;
+    display: inline-block;
+    width: 50px;
+}
+
+.change_percent_up {
+    color: green;
+    display: inline-block;
+    width: 50px;
+}
+
+.open, .title_open {
+    color: #000000;
+    display: inline-block;
+    width: 40px;
+}
+
+
+.title_days_low_high,
+.days_high,
+.days_low {
+    color: #000000;
+    display: inline-block;
+    width: 50px;
+}
+
+.title_delete_button {
+    display: inline-block;
+    width: 11px;
+}

@@ -1,7 +1,7 @@
 /**
  * Created by kehuang on 4/8/14.
  */
-var initialQuoteList = ["BAC", "GOOG", "TSLA", "WUBA", "FEYE", "VEEV", "KNDI", "DDD", 'BID'];
+var initialQuoteList = ["BAC", "GOOG", "TSLA", "WUBA", "FEYE", "VEEV", "KNDI", "DDD", 'BID', 'KATE'];
 var view = new View();
 var myQuoteAlert = new MyQuoteAlert(initialQuoteList);
 var controller = new Controller(view, myQuoteAlert, initialQuoteList);
@@ -27,9 +27,7 @@ function startStockAlert() {
     controller.initView(); // make the initial view
 
 //    controller.setMode(YAHOO_QUERY_MODE);
-
 //    controller.setMode(WEBSERVICE_QUERY_MODE);
-
 //    controller.updateQuote(['GOOG', 'AAPL']);
 //    controller.updateQuote('GOOG');
 
